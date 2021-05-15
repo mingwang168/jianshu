@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
+import {withRouter} from 'react-router-dom';
 import axios from 'axios';
 import { DetailWrapper,Header,Content } from "./style";
 
@@ -34,4 +35,4 @@ const mapState=(state,props)=>{
 content:state.get('detail').get('content')
     }
 }
-export default connect(mapState,mapDispatch)(Detail)
+export default connect(mapState,mapDispatch)(withRouter(Detail));

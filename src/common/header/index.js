@@ -1,5 +1,6 @@
 import React, { Component } from "react";
-import {Link} from 'react-router-dom';
+import cookie from "react-cookies";
+import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 import "../../static/iconfont/iconfont.css";
 import { CSSTransition } from "react-transition-group";
@@ -29,6 +30,20 @@ import {
 } from "./style.js";
 
 class Header extends Component {
+  constructor(props){
+    super(props);
+
+    try {this.loginFromCookie = JSON.parse(cookie.load("login"));}
+    catch{
+      this.props.updateLogin(false);
+     // this.props.history.push("/login");
+    }
+
+  //  this.loginFromCookie = JSON.parse(cookie.load("login"));
+    console.log(this.loginFromCookie);
+    this.props.updateLogin(this.loginFromCookie);
+  };
+
   render() {
     const {
       focused,
@@ -41,7 +56,7 @@ class Header extends Component {
       handleMouseEnter,
       handleMouseLeave,
       handleChangePage,
-      login
+      loginStatus,
     } = this.props;
     const getPageList = () => {
       const newList = list.toJS();
@@ -55,17 +70,27 @@ class Header extends Component {
         return pageList;
       }
     };
+
     return (
       <div>
         <HeaderWrapper>
-          <Link to='/'>
-                    <Logo />
+          <Link to="/">
+            <Logo />
           </Link>
-
           <Nav>
             <NavItem className="left active">首页</NavItem>
             <NavItem className="left">下载App</NavItem>
-            {login?<NavItem className="right" onClick={this.props.quit}>退出</NavItem>:<Link to='/login'><NavItem className="right">登录</NavItem></Link>}
+            {loginStatus ? (
+              <Link to="/">
+                <NavItem className="right" onClick={this.props.quit}>
+                  退出
+                </NavItem>
+              </Link>
+            ) : (
+              <Link to="/login">
+                <NavItem className="right">登录</NavItem>
+              </Link>
+            )}
             <NavItem className="right">
               <i className="iconfont">&#xe603;</i>
             </NavItem>
@@ -109,10 +134,12 @@ class Header extends Component {
             </SearchWrapper>
           </Nav>
           <Addition>
-            <Button className="writting">
-              <i className="iconfont">&#xe6a6;</i>
-              写文章
-            </Button>
+            <Link to="/write">
+              <Button className="writting">
+                <i className="iconfont">&#xe6a6;</i>
+                写文章
+              </Button>
+            </Link>
             <Button className="reg">注册</Button>
           </Addition>
         </HeaderWrapper>
@@ -151,9 +178,12 @@ const mapDispatchToProps = (dispatch) => {
         dispatch(changePage(1));
       }
     },
-    quit(){
-      dispatch({type:'quit'})
-    }
+    updateLogin(login) {
+      dispatch({ type: "updateLogin", login });
+    },
+    quit() {
+      dispatch({ type: "quit" });
+    },
   };
 };
 
@@ -164,7 +194,7 @@ export default connect(
     totalPage: state.getIn(["header", "totalPage"]),
     page: state.getIn(["header", "page"]),
     mouseIn: state.getIn(["header", "mouseIn"]),
-    login:state.getIn(["login", "login"])
+    loginStatus: state.getIn(["login", "login"]),
   }),
   mapDispatchToProps
 )(Header);

@@ -1,5 +1,6 @@
 import React, { PureComponent } from "react";
 import {Redirect} from 'react-router-dom';
+import cookie from 'react-cookies';
 import {connect} from 'react-redux';
 import List from "./components/List";
 import Recommend from "./components/Recommend";
@@ -14,7 +15,7 @@ class Home extends PureComponent {
     window.scrollTo(0,0)
   }
   componentDidMount=()=>{
-    this.props.setHomeList();
+  //  this.props.setHomeList();
     this.bindEvent();
   }
   componentWillUnmount=()=>{
@@ -48,7 +49,7 @@ class Home extends PureComponent {
 }
 const mapState=(state)=>({
 showScroll:state.get('home').get('showScroll'),
-loginStatus:state.get('login').get('login'),
+loginStatus:cookie.load('login'),
 })
 
 const mapDispatch=(dispatch)=>({
@@ -57,13 +58,17 @@ const mapDispatch=(dispatch)=>({
     .then((res)=>{
      const data=res.data;
       dispatch({type:"set_homeList",data});
+      var listFromStor=localStorage.getItem('list');
+      if(listFromStor===null){
+        localStorage.setItem('list',JSON.stringify(data));
+      }
     })
     .catch((err)=>{
       console.log(err);
     })
   },
   changeScrollTopShow:()=>{
-    if (document.documentElement.scrollTop > 200){
+    if (document.documentElement.scrollTop > 500){
       dispatch({type:'toggle_goback',data:true})
     }else{
       dispatch({type:'toggle_goback',data:false})

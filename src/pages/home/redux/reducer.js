@@ -32,6 +32,9 @@ const homeReducer = (state = defaultState, action) => {
         });
       case "toggle_goback":
          return state.set('showScroll',fromJS(action.data));
+      case "add_new_article":
+        let old=state.get('articleList')
+         return state.set('articleList',fromJS(action.na));
     default:
       return state;
   }
